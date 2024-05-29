@@ -43,3 +43,24 @@ func TestGetTps(t *testing.T) {
 		t.Fatalf("GetTps() returned last milliseconds of zero, less than zero, or nil (got %f)", res.MillisecondsLastTick)
 	}
 }
+
+func TestGetPlaytimeLeaderboard(t *testing.T) {
+	res, err := GetPlaytimeLeaderboard()
+
+	if err != nil {
+		t.Fatalf("GetPlaytimeLeaderboard() returned error %s", err.Error())
+	}
+
+	if res.UpdatedAt == nil {
+		t.Fatalf("GetPlaytimeLeaderboard() returned no updated at value")
+	}
+
+	entry := res.Entries[0]
+	if entry.Username == "" {
+		t.Fatalf("GetPlaytimeLeaderboard() returned empty username on first entry")
+	}
+
+	if entry.Seconds <= 0 {
+		t.Fatalf("GetPlaytimeLeaderboard() returned zero seconds, less than zero, or nil on first entry (got %d)", entry.Seconds)
+	}
+}

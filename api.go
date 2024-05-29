@@ -1,5 +1,7 @@
 package switchcraftgo
 
+import "time"
+
 type PlayerCountsResponse struct {
 	Total  int `json:"total"`
 	Active int `json:"active"`
@@ -41,4 +43,38 @@ func GetTps() (*TpsResponse, error) {
 	}
 
 	return &tps, nil
+}
+
+type PlayTimeLeaderboard struct {
+	UpdatedAt *time.Time
+	Entries   []struct {
+		Username string `json:"name"`
+		Seconds  int    `json:"time"`
+	}
+}
+
+// Fetches the leaderboard of who has been the most active player
+func GetPlaytimeLeaderboard() (*PlayTimeLeaderboard, error) {
+	var leaderboardData struct {
+		UpdatedAt string `json:"lastUpdated"`
+		Entries   []struct {
+			Username string `json:"name"`
+			Seconds  int    `json:"time"`
+		} `json:"entries"`
+	}
+
+	err := makeGetJsonRequest("https://api.sc3.io/v3/activetime", &leaderboardData)
+	if err != nil {
+		return nil, err
+	}
+
+	timestamp, err := parseScTimestamp(leaderboardData.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PlayTimeLeaderboard{
+		UpdatedAt: &timestamp,
+		Entries:   leaderboardData.Entries,
+	}, nil
 }
