@@ -1,4 +1,4 @@
-module github.com/Erb3/switchchatgo/examples/get_playtimes
+module github.com/erb3/examples/chatbox_helloworld
 
 go 1.22.1
 

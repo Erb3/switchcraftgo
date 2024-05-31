@@ -5,3 +5,8 @@ Golang API wrapper for the [SwitchCraft3](https://sc3.io) [Chatbox API](https://
 ```bash
 go get -u github.com/Erb3/switchcraftgo
 ```
+
+## API
+
+The API wrapper is fully documented with comments, tests and examples for every function.
+View it on the Golang package site.
