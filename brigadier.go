@@ -251,7 +251,7 @@ func (cmd *BrigadierCommand) getHelp(parentName string, depth int) []string {
 	if parentName == "" {
 		lines = append(lines, fmt.Sprintf("`\\%s %s`", cmd.name, cmd.getArgsHelp()))
 	} else {
-		lines = append(lines, fmt.Sprintf("`↪%s %s %s %s`", strings.Repeat(" ↪", depth-1), parentName, cmd.name, cmd.getArgsHelp()))
+		lines = append(lines, fmt.Sprintf("↪ %s `%s %s %s`", strings.Repeat(" ↪", depth-1), parentName, cmd.name, cmd.getArgsHelp()))
 	}
 
 	for _, sub := range cmd.sub_commands {
