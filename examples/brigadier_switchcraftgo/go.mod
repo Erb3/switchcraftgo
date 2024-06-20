@@ -1,4 +1,4 @@
-module github.com/Erb3/switchcraftgo/examples/get_playtimes
+module github.com/Erb3/switchcraftgo/examples/brigadier_multiply
 
 go 1.22.1
 

@@ -83,8 +83,6 @@ func (b *Brigadier) parse(cmd *BrigadierCommand, packet ChatboxCommandPacket) {
 	} else {
 		for _, sub := range cmd.sub_commands {
 			if sub.name == packet.Args[0] {
-				log.Printf("found subcommand named %s", sub.name)
-
 				b.parse(sub, ChatboxCommandPacket{
 					Event:     packet.Event,
 					User:      packet.User,
@@ -103,7 +101,7 @@ func (b *Brigadier) parse(cmd *BrigadierCommand, packet ChatboxCommandPacket) {
 	}
 
 	if target == nil || target.executes == nil {
-		b.tellError(packet.User.Uuid, "No subcommand or argument found")
+		b.tellError(packet.User.Uuid, fmt.Sprintf("No subcommand or argument found. Check out &7\\%s help &cfor more information.", cmd.name))
 		return
 	}
 
@@ -160,6 +158,14 @@ func (b *Brigadier) Register(commands ...*BrigadierCommand) {
 		if err != nil {
 			log.Panicf("error while parsing command %s: %s", command.name, err.Error())
 		}
+
+		command.Then(b.Literal("help").Executes(func(bi *BrigadierInvocation) {
+			var content []string
+			content = append(content, fmt.Sprintf("**\\%s Help Page**", command.name))
+			content = append(content, command.getHelp("", 0)...)
+
+			bi.ReplyMarkdown(strings.Join(content, "\n"))
+		}))
 	}
 
 	b.cmds = append(b.cmds, commands...)
@@ -222,6 +228,36 @@ func (cmd *BrigadierCommand) Number(arg_name string) *BrigadierCommand {
 func (cmd *BrigadierCommand) Boolean(arg_name string) *BrigadierCommand {
 	cmd.push_arg_def(arg_name, "boolean")
 	return cmd
+}
+
+func (cmd *BrigadierCommand) getHelp(parentName string, depth int) []string {
+	var lines []string
+
+	if parentName == "" {
+		lines = append(lines, fmt.Sprintf("`\\%s %s`", cmd.name, cmd.getArgsHelp()))
+	} else {
+		lines = append(lines, fmt.Sprintf("`↪%s %s %s %s`", strings.Repeat(" ↪", depth-1), parentName, cmd.name, cmd.getArgsHelp()))
+	}
+
+	for _, sub := range cmd.sub_commands {
+		if parentName == "" {
+			lines = append(lines, strings.Join(sub.getHelp(fmt.Sprintf("\\%s", cmd.name), depth+1), "\n"))
+		} else {
+			lines = append(lines, strings.Join(sub.getHelp(fmt.Sprintf("%s %s", parentName, cmd.name), depth+1), "\n"))
+		}
+	}
+
+	return lines
+}
+
+func (cmd *BrigadierCommand) getArgsHelp() string {
+	out := ""
+
+	for _, arg := range cmd.arguments {
+		out += fmt.Sprintf("[%s: %s] ", arg.name, arg.value_type)
+	}
+
+	return out
 }
 
 // Replies to the user with the supplied message, in format mode.
