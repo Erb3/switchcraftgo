@@ -118,6 +118,21 @@ func (b *Brigadier) parse(cmd *BrigadierCommand, packet ChatboxCommandPacket) {
 
 		switch arg.value_type {
 		case "string":
+			if strings.HasPrefix(str, "'") || strings.HasPrefix(str, "\"") || strings.HasPrefix(str, "«") {
+				closingArgument := -1
+
+				for idx, future_arg := range packet.Args[arg.index:] {
+					if strings.HasSuffix(future_arg, "'") || strings.HasSuffix(future_arg, "\"") || strings.HasSuffix(future_arg, "»") {
+						closingArgument = idx
+					}
+				}
+
+				if closingArgument != -1 {
+					str = strings.Join(packet.Args[arg.index:closingArgument+1], " ")
+					str = str[1 : len(str)-1]
+				}
+			}
+
 			string_args[arg_name] = str
 		case "number":
 			num, err := strconv.Atoi(str)
