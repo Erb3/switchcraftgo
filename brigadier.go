@@ -42,6 +42,7 @@ type BrigadierInvocation struct {
 	User         *ChatboxIngameUser
 	parent       *BrigadierCommand
 	brigadier    *Brigadier
+	OwnerOnly    bool
 }
 
 // Creates a new instance of Brigadier.
@@ -163,6 +164,7 @@ func (b *Brigadier) parse(cmd *BrigadierCommand, packet ChatboxCommandPacket) {
 		string_args:  string_args,
 		number_args:  number_args,
 		boolean_args: bool_args,
+		OwnerOnly:    packet.OwnerOnly,
 	})
 }
 
